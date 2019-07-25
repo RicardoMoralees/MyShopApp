@@ -23,10 +23,10 @@ public class AddToCartService {
         call.enqueue(new Callback<Respuesta>() {
             @Override
             public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-                if (response.body().getResponseCode() == Constants.RESPONSECODE_OK){
-                    callback.onSuccess();
+                if (response.isSuccessful()){
+                    callback.onSuccessAddCarrito();
                 }else {
-                    callback.onFail(response.message());
+                    callback.onFail("El producto ya se encuentra en el carrito");
                 }
             }
 
@@ -38,7 +38,7 @@ public class AddToCartService {
     }
 
     public interface AddToCartInterface{
-        void onSuccess();
+        void onSuccessAddCarrito();
         void onFail(String message);
     }
 }

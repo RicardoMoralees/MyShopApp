@@ -5,11 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.List;
 
-import io.realm.Realm;
-import io.realm.RealmObject;
-import myshop.com.myshop.utils.MyShopApp;
-
-public class Producto extends RealmObject implements Serializable {
+public class Producto implements Serializable {
 
     @SerializedName("idProducto")
     private int idProducto;
@@ -25,6 +21,9 @@ public class Producto extends RealmObject implements Serializable {
 
     @SerializedName("imagen")
     private String imagen;
+
+    public Producto() {
+    }
 
     public int getIdProducto() {
         return idProducto;
@@ -66,18 +65,4 @@ public class Producto extends RealmObject implements Serializable {
         this.imagen = imagen;
     }
 
-    public static Producto getProducto() {
-        return MyShopApp.getRealmInstance()
-                .where(Producto.class)
-                .findFirst();
-    }
-
-    public static List<Producto> getProductos() {
-        Realm realm = MyShopApp.getRealmInstance();
-        List<Producto> productos;
-        realm.beginTransaction();
-        productos = realm.copyFromRealm(realm.where(Producto.class).findAll());
-        realm.commitTransaction();
-        return productos;
-    }
 }

@@ -28,7 +28,7 @@
 
     <string name="my_products">Nuestros productos</string>
     <string name="your_cart">Tu carrito</string>
-    <string name="price">$%1$d</string>
+    <string name="price">$%1$s</string>
 
     <string name="product_added">Producto agregado al carrito</string>
 

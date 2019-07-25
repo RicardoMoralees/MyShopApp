@@ -11,24 +11,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import myshop.com.myshop.R;
 import myshop.com.myshop.adapters.ProductAdapter;
 import myshop.com.myshop.models.Carrito;
 import myshop.com.myshop.models.Producto;
-import myshop.com.myshop.models.Usuario;
-import myshop.com.myshop.services.GetCartService;
-import myshop.com.myshop.utils.MyShopApp;
+import myshop.com.myshop.services.RemoveFromCartService;
+import myshop.com.myshop.utils.Session;
 import myshop.com.myshop.utils.Utils;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CarritoFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class CarritoFragment extends Fragment implements ProductAdapter.ItemInterface {
+public class CarritoFragment extends Fragment implements ProductAdapter.ItemInterface, RemoveFromCartService.RemoveFromCartInterface {
 
     private Carrito carrito;
     private RecyclerView rvCarritoProducts;
@@ -36,6 +30,7 @@ public class CarritoFragment extends Fragment implements ProductAdapter.ItemInte
     private ProductAdapter adapter;
     private Context context;
     private TextView tvCarritoTotal;
+    private LinearLayout totalContainer;
 
     public CarritoFragment() {
         // Required empty public constructor
@@ -44,7 +39,8 @@ public class CarritoFragment extends Fragment implements ProductAdapter.ItemInte
     public static CarritoFragment newInstance(Context context, Carrito carrito) {
         CarritoFragment fragment = new CarritoFragment();
         Bundle args = new Bundle();
-
+        fragment.carrito = carrito;
+        fragment.context = context;
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,6 +57,7 @@ public class CarritoFragment extends Fragment implements ProductAdapter.ItemInte
         rvCarritoProducts = view.findViewById(R.id.rv_cart_products);
         ivEmptyCart = view.findViewById(R.id.iv_cart_empty);
         tvCarritoTotal = view.findViewById(R.id.tv_carrito_total);
+        totalContainer = view.findViewById(R.id.carrito_total_container);
 
         if (carrito != null){
             setAdapter();
@@ -71,33 +68,42 @@ public class CarritoFragment extends Fragment implements ProductAdapter.ItemInte
 
     @Override
     public void onItemClicked(Producto producto) {
-        Realm realm = MyShopApp.getRealmInstance();
-        realm.beginTransaction();
-        carrito.getProductoList().remove(producto);
-        realm.delete(Carrito.class);
-        realm.copyToRealm(carrito);
-        realm.commitTransaction();
-        if (carrito.getProductoList().size() == 0){
-            ivEmptyCart.setVisibility(View.VISIBLE);
-            rvCarritoProducts.setVisibility(View.GONE);
-        } else {
-            adapter.notifyDataSetChanged();
-        }
+        RemoveFromCartService.startService(producto, Session.getInstance().getEmail(),this);
     }
 
     private void setAdapter(){
         if (carrito.getProductoList().size() == 0){
             ivEmptyCart.setVisibility(View.VISIBLE);
             rvCarritoProducts.setVisibility(View.GONE);
-            tvCarritoTotal.setVisibility(View.GONE);
+            totalContainer.setVisibility(View.GONE);
         }else {
             rvCarritoProducts.setLayoutManager(new LinearLayoutManager(context));
             adapter = new ProductAdapter(context, carrito.getProductoList(), this, true);
             rvCarritoProducts.setAdapter(adapter);
+            ivEmptyCart.setVisibility(View.GONE);
             rvCarritoProducts.setVisibility(View.VISIBLE);
-            tvCarritoTotal.setVisibility(View.VISIBLE);
+            totalContainer.setVisibility(View.VISIBLE);
             tvCarritoTotal.setText(Utils.getFormatPrize(context,carrito.getTotal()));
         }
+
+    }
+
+    @Override
+    public void onSuccessRemoveCarrito(Carrito newCarrito) {
+        this.carrito = newCarrito;
+        if (carrito.getProductoList().size() == 0){
+            ivEmptyCart.setVisibility(View.VISIBLE);
+            rvCarritoProducts.setVisibility(View.GONE);
+            totalContainer.setVisibility(View.GONE);
+        } else {
+            tvCarritoTotal.setText(Utils.getFormatPrize(context, carrito.getTotal()));
+            adapter.setProductos(carrito.getProductoList());
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onFailRemove(String message) {
 
     }
 }

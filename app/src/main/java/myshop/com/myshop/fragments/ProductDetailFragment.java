@@ -4,6 +4,7 @@ package myshop.com.myshop.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,7 @@ import myshop.com.myshop.utils.Utils;
 public class ProductDetailFragment extends Fragment implements View.OnClickListener {
 
     private Producto producto;
-    private ImageButton btnAddCart;
+    private Button btnAddCart;
     private TextView tvProductName, tvProductDesc, tvProductPrice;
     private ImageView ivProductImage;
     private Context context;

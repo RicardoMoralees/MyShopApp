@@ -1,5 +1,7 @@
 package myshop.com.myshop.activities;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,8 +19,7 @@ import myshop.com.myshop.utils.Constants;
 
 public class DetalleActivity extends AppCompatActivity implements GetProductService.ProductInterface, AddToCartService.AddToCartInterface {
 
-    TextView tvCartItemCounter;
-    ProductDetailFragment detailFragment;
+    private ProductDetailFragment detailFragment;
     private ProgressBar progressBar;
     private Producto producto;
     private String userId;
@@ -45,14 +46,26 @@ public class DetalleActivity extends AppCompatActivity implements GetProductServ
     }
 
     @Override
-    public void onSuccess() {
-        Toast.makeText(this,getString(R.string.product_added),Toast.LENGTH_SHORT);
+    public void onSuccessAddCarrito() {
+        Toast.makeText(this,getString(R.string.product_added),Toast.LENGTH_SHORT).show();
         setResult(Constants.RESULT_OK);
         finish();
     }
 
     @Override
     public void onFail(String message) {
-
+        AlertDialog alertDialog =
+                new AlertDialog.Builder(this)
+                        .setMessage(message)
+                        .setTitle(getString(R.string.error_alertDialog_title))
+                        .setPositiveButton(getString(R.string.accept), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                                finish();
+                            }
+                        })
+                        .create();
+        alertDialog.show();
     }
 }

@@ -18,12 +18,15 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import myshop.com.myshop.R;
 import myshop.com.myshop.models.Usuario;
 import myshop.com.myshop.services.CreateUserService;
 import myshop.com.myshop.utils.Constants;
+import myshop.com.myshop.utils.Session;
+import myshop.com.myshop.utils.Utils;
 
 public class RegistryActivity extends AppCompatActivity
         implements TextWatcher,
@@ -40,14 +43,15 @@ public class RegistryActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registry);
 
-
+        initViews();
     }
 
     private void initViews(){
         etEmail = findViewById(R.id.et_registry_email);
         btnRegister = findViewById(R.id.btn_register);
 
-        etPassword = findViewById(R.id.password);
+        etPassword = findViewById(R.id.et_registry_password);
+        etName = findViewById(R.id.et_registry_name);
         etPassword.addTextChangedListener(this);
         etEmail.addTextChangedListener(this);
         etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -129,9 +133,7 @@ public class RegistryActivity extends AppCompatActivity
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
+        Utils.hideKeyboard(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -181,10 +183,11 @@ public class RegistryActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSuccess() {
+    public void onSuccess(Usuario usuario) {
         showProgress(false);
+        Session.getInstance().saveLogged(true);
+        Session.getInstance().saveEmail(usuario.getCorreo());
         Intent i = new Intent(this, MainActivity.class);
-        i.putExtra(Constants.EXTRA_ID_USUARIO, etEmail.getText().toString());
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         finish();

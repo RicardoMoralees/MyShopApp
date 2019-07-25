@@ -61,7 +61,7 @@ public class MainFragment extends Fragment {
         rvContenido = view.findViewById(R.id.rv_products);
 
         rvContenido.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new ProductAdapter(context, productos,itemInterface);
+        adapter = new ProductAdapter(context, productos,itemInterface, false);
         rvContenido.setAdapter(adapter);
         rvContenido.setVisibility(View.VISIBLE);
     }

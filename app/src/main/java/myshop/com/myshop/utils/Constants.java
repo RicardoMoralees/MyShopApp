@@ -11,4 +11,6 @@ public class Constants {
 
     public static final int RESULT_OK = 1;
     public static final int RESULT_CANCEL = 0;
+
+    public static final int REQUEST_CARRITO = 1000;
 }

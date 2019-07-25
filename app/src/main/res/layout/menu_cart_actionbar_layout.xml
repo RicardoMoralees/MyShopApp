@@ -6,9 +6,10 @@
 
     <!-- Menu Item Image -->
     <ImageView
+        android:id="@+id/shopping_cart"
         android:layout_width="48dp"
         android:layout_height="wrap_content"
-        android:clickable="true"
+        android:onClick="onClick"
         android:src="@drawable/ic_shopping_cart_white" />
 
     <!-- Badge Count -->

@@ -23,6 +23,8 @@ import android.widget.TextView;
 import myshop.com.myshop.R;
 import myshop.com.myshop.services.LoginService;
 import myshop.com.myshop.utils.Constants;
+import myshop.com.myshop.utils.Session;
+import myshop.com.myshop.utils.Utils;
 
 public class LoginActivity extends AppCompatActivity
         implements TextWatcher,
@@ -116,6 +118,7 @@ public class LoginActivity extends AppCompatActivity
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
+        Utils.hideKeyboard(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -174,8 +177,10 @@ public class LoginActivity extends AppCompatActivity
     @Override
     public void onLoginSuccess() {
         showProgress(false);
+        String email = etUsuario.getText().toString();
+        Session.getInstance().saveLogged(true);
+        Session.getInstance().saveEmail(email);
         Intent i = new Intent(this, MainActivity.class);
-        i.putExtra(Constants.EXTRA_ID_USUARIO,etUsuario.getText().toString());
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         finish();
@@ -201,7 +206,8 @@ public class LoginActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         if (view.getId() == tvCreateUser.getId()){
-
+            Intent i = new Intent(this, RegistryActivity.class);
+            startActivity(i);
         }
         if (view.getId() == btnLogin.getId()){
             attemptLogin();

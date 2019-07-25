@@ -103,4 +103,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ContentV
     public interface ItemInterface{
         void onItemClicked(Producto producto);
     }
+
+    public void setProductos(List<Producto> productos) {
+        this.productos = productos;
+    }
 }

@@ -8,6 +8,7 @@ import myshop.com.myshop.models.Respuesta;
 import myshop.com.myshop.models.Usuario;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -41,5 +42,11 @@ public interface MyShopInterface {
     @GET("/carrito/{id}")
     Call<Carrito> getCarrito(
             @Path("id") String id
+    );
+
+    @DELETE("/carrito/{idCarrito}/{idProducto}")
+    Call<Carrito> removeFromCart(
+            @Path("idCarrito") String idCarrito,
+            @Path("idProducto") int idProducto
     );
 }

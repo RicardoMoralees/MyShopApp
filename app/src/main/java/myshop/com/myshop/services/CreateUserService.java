@@ -13,7 +13,7 @@ import retrofit2.Response;
 
 public class CreateUserService {
 
-    public static void startService(Usuario usuario, final RegisterInterface callback){
+    public static void startService(final Usuario usuario, final RegisterInterface callback){
 
         MyShopInterface service = RetrofitInstance
                 .getInstance()
@@ -25,7 +25,7 @@ public class CreateUserService {
             @Override
             public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
                 if (response.body().getResponseCode() == Constants.RESPONSECODE_OK){
-                    callback.onSuccess();
+                    callback.onSuccess(usuario);
                 }else {
                     callback.onFail(response.body().getResponseMessage());
                 }
@@ -39,7 +39,7 @@ public class CreateUserService {
     }
 
     public interface RegisterInterface{
-        void onSuccess();
+        void onSuccess(Usuario usuario);
         void onFail(String message);
     }
 }

@@ -8,27 +8,36 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
 import myshop.com.myshop.R;
 import myshop.com.myshop.adapters.ProductAdapter;
+import myshop.com.myshop.dialogs.CerrarSesionDialog;
 import myshop.com.myshop.fragments.MainFragment;
 import myshop.com.myshop.models.Carrito;
 import myshop.com.myshop.models.Producto;
 import myshop.com.myshop.services.GetCartService;
 import myshop.com.myshop.services.GetProductsService;
 import myshop.com.myshop.utils.Constants;
+import myshop.com.myshop.utils.Session;
 
-public class MainActivity extends AppCompatActivity implements GetProductsService.ProductoInterface, ProductAdapter.ItemInterface, GetCartService.GetCarritoInterface {
+public class MainActivity extends AppCompatActivity
+        implements GetProductsService.ProductoInterface,
+        ProductAdapter.ItemInterface,
+        GetCartService.GetCarritoInterface,
+        View.OnClickListener{
 
-    TextView tvCartItemCounter;
-    MainFragment mainFragment;
+    private TextView tvCartItemCounter;
+    private MainFragment mainFragment;
     private ProgressBar progressBar;
-    private String id;
+    private CerrarSesionDialog cerrarSesionDialog;
+    private Carrito carrito;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements GetProductsServic
 
         progressBar = findViewById(R.id.pb_main);
 
-        id = getIntent().getStringExtra(Constants.EXTRA_ID_USUARIO);
 
         GetProductsService.startService(this);
     }
@@ -50,7 +58,10 @@ public class MainActivity extends AppCompatActivity implements GetProductsServic
         RelativeLayout notifCount = (RelativeLayout) MenuItemCompat.getActionView(item);
 
         tvCartItemCounter = notifCount.findViewById(R.id.actionbar_notifcation_textview);
-        tvCartItemCounter.setText("12");
+        tvCartItemCounter.setText("0");
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -58,16 +69,20 @@ public class MainActivity extends AppCompatActivity implements GetProductsServic
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.badge) {
-            Log.e("MenuOption","Carrito");
-            return true;
-        }
         if (id == R.id.logout) {
-            Log.e("MenuOption","Logout");
+            showLogoutDialog();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showLogoutDialog(){
+        if (cerrarSesionDialog != null){
+            cerrarSesionDialog.show(getSupportFragmentManager(),"LogoutDialog");
+        }else {
+            cerrarSesionDialog = CerrarSesionDialog.create(this);
+            showLogoutDialog();
+        }
     }
 
     //getProducts
@@ -76,12 +91,7 @@ public class MainActivity extends AppCompatActivity implements GetProductsServic
         progressBar.setVisibility(View.GONE);
         mainFragment = MainFragment.newInstance(this,productos, this);
         getSupportFragmentManager().beginTransaction().add(R.id.main_container,mainFragment).commit();
-    }
-
-    //getCarrito
-    @Override
-    public void onSuccess(Carrito carrito) {
-        tvCartItemCounter.setText(carrito.getProductoList().size());
+        GetCartService.startService(Session.getInstance().getEmail(),this);
     }
 
     @Override
@@ -89,19 +99,52 @@ public class MainActivity extends AppCompatActivity implements GetProductsServic
 
     }
 
+    //getCarrito
+    @Override
+    public void onSuccessCarrito(Carrito carrito) {
+        Log.e("MainActivity", "onSuccesscarrito");
+        this.carrito = carrito;
+        setTvCartItemCounter(carrito.getProductoList().size() + "");
+    }
+
+    @Override
+    public void onFailCarrito(String message) {
+
+    }
+
     @Override
     public void onItemClicked(Producto producto) {
         Intent intent = new Intent(this, DetalleActivity.class);
         intent.putExtra(Constants.EXTRA_ID_PRODUCTO, producto.getIdProducto());
-        intent.putExtra(Constants.EXTRA_ID_USUARIO, id);
-        startActivityForResult(intent,1);
+        intent.putExtra(Constants.EXTRA_ID_USUARIO, Session.getInstance().getEmail());
+        startActivityForResult(intent,Constants.REQUEST_CARRITO);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Constants.RESPONSECODE_OK){
-            GetCartService.startService(id, this);
+        if (requestCode == Constants.REQUEST_CARRITO){
+            GetCartService.startService(Session.getInstance().getEmail(),this);
+        }
+    }
+
+    private void setTvCartItemCounter(String items){
+        tvCartItemCounter.setText(items);
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.shopping_cart){
+            Intent intent = new Intent(this, CarritoActivity.class);
+            startActivity(intent);
+        }
+        if (view.getId() == R.id.btn_dialog_cerrar_sesion){
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Session.getInstance().cerrarSesion();
+            startActivity(intent);
+            finish();
         }
     }
 }

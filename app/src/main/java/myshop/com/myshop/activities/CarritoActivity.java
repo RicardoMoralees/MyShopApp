@@ -1,7 +1,11 @@
 package myshop.com.myshop.activities;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import myshop.com.myshop.R;
@@ -9,6 +13,7 @@ import myshop.com.myshop.fragments.CarritoFragment;
 import myshop.com.myshop.models.Carrito;
 import myshop.com.myshop.models.Usuario;
 import myshop.com.myshop.services.GetCartService;
+import myshop.com.myshop.utils.Session;
 
 public class CarritoActivity extends AppCompatActivity implements GetCartService.GetCarritoInterface {
 
@@ -24,25 +29,23 @@ public class CarritoActivity extends AppCompatActivity implements GetCartService
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back);
 
         progressBar = findViewById(R.id.pb_carrito);
-
-        carrito = Carrito.getCarrito();
-        if (carrito == null){
-            GetCartService.startService(Usuario.getUsuario().getCorreo(), this);
-        } else {
-            carritoFragment = CarritoFragment.newInstance(this,carrito);
-        }
-
+        GetCartService.startService(Session.getInstance().getEmail(), this);
     }
 
     @Override
-    public void onSuccess(Carrito Carrito) {
+    public void onSuccessCarrito(Carrito carrito) {
         this.carrito = carrito;
+        openCarritoFragment();
+    }
+
+    @Override
+    public void onFailCarrito(String message) {
+
+    }
+
+    private void openCarritoFragment(){
+        progressBar.setVisibility(View.GONE);
         carritoFragment = CarritoFragment.newInstance(this,carrito);
         getSupportFragmentManager().beginTransaction().add(R.id.carrito_container, carritoFragment).commit();
-    }
-
-    @Override
-    public void onFail(String message) {
-
     }
 }

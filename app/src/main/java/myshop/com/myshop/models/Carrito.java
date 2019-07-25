@@ -5,26 +5,25 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.List;
 
-import io.realm.RealmList;
-import io.realm.RealmObject;
-import myshop.com.myshop.utils.MyShopApp;
-
-public class Carrito extends RealmObject implements Serializable {
+public class Carrito implements Serializable {
 
     @SerializedName("idCarritoUsuario")
-    private int idCarritoUsuario;
+    private String idCarritoUsuario;
 
     @SerializedName("productoList")
-    private RealmList<Producto> productoList;
+    private List<Producto> productoList;
 
     @SerializedName("total")
     private double total;
 
-    public int getIdCarritoUsuario() {
+    public Carrito() {
+    }
+
+    public String getIdCarritoUsuario() {
         return idCarritoUsuario;
     }
 
-    public void setIdCarritoUsuario(int idCarritoUsuario) {
+    public void setIdCarritoUsuario(String idCarritoUsuario) {
         this.idCarritoUsuario = idCarritoUsuario;
     }
 
@@ -40,9 +39,4 @@ public class Carrito extends RealmObject implements Serializable {
         this.total = total;
     }
 
-    public static Carrito getCarrito() {
-        return MyShopApp.getRealmInstance()
-                .where(Carrito.class)
-                .findFirst();
-    }
 }

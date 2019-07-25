@@ -4,10 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-import io.realm.RealmObject;
-import myshop.com.myshop.utils.MyShopApp;
-
-public class Usuario extends RealmObject implements Serializable {
+public class Usuario implements Serializable {
 
 
     @SerializedName("correo")
@@ -18,6 +15,9 @@ public class Usuario extends RealmObject implements Serializable {
 
     @SerializedName("contrasena")
     private String contrasena;
+
+    public Usuario() {
+    }
 
     public Usuario(String correo, String contrasena) {
         this.correo = correo;
@@ -52,12 +52,6 @@ public class Usuario extends RealmObject implements Serializable {
 
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
-    }
-
-    public static Usuario getUsuario() {
-        return MyShopApp.getRealmInstance()
-                .where(Usuario.class)
-                .findFirst();
     }
 
 }
