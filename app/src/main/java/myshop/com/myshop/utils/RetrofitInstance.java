@@ -15,7 +15,7 @@ public class RetrofitInstance {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
             instance = new Retrofit.Builder()
-                    .baseUrl("https://26ad7ad5.ngrok.io/")
+                    .baseUrl("https://941dbb3d.ngrok.io/")
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
